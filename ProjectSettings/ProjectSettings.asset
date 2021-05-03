@@ -649,7 +649,7 @@ PlayerSettings:
   vrEditorSettings: {}
   cloudServicesEnabled:
     Collab: 0
-    UNet: 1
+    UNet: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -663,7 +663,7 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 0
-  cloudProjectId: be91b37e-c35e-4ea9-812e-2941d7198bf0
+  cloudProjectId:
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: Downhill Racing
