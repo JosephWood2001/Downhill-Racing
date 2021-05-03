@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3472307706223742262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3472307706223742260}
+  - component: {fileID: 3472307706223742261}
+  m_Layer: 0
+  m_Name: SGameManager
+  m_TagString: GameManager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3472307706223742260
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472307706223742262}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.0639915, y: 0.29423773, z: -0.8712244}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3472307706223742261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472307706223742262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4705b314d6f3742a06fcf59c9ca1e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loadedCourse: 
+  numberOfRacers: 8
+  racers: []
+  playerInputSender: {fileID: 2648915757137067384, guid: 191fc4f95e42bec42b2e52bbfa765d8d,
+    type: 3}
+  computerInputSender: {fileID: 2648915757137067384, guid: d59b983f42b824d439181411e26b0346,
+    type: 3}
+  scoreboardPrefab: {fileID: 5619383781913056434, guid: 1af13307c3adc9147a0dca2c0f84d7fe,
+    type: 3}
+  cup:
+    cupMiniIcon: {fileID: 0}
+    courses: []
+    coursesMiniIcons: []
+  courseOfCupId: 0
+  difficulty: 0
