@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [DisplayWithoutEdit]
     public string loadedCourse = "";
 
     public virtual void RaceComplete()

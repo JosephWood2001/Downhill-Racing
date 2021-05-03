@@ -4,20 +4,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class SGameManager : GameManager
 {
-    [DisplayWithoutEdit]
     public int numberOfRacers = 8;
-    [DisplayWithoutEdit]
     public RacerId[] racers; //player is always index 0
     public GameObject playerInputSender;
     public GameObject computerInputSender;
 
     public GameObject scoreboardPrefab;
 
-    [DisplayWithoutEdit]
     public MapCatolog.Cup cup;
-    [DisplayWithoutEdit]
     public int courseOfCupId = -1;
-    [DisplayWithoutEdit]
     public int difficulty;
 
     void Start()

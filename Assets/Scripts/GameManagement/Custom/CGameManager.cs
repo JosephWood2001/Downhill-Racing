@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class CGameManager : GameManager
 {
-    [DisplayWithoutEdit]
     public int numberOfRacers = 8;
     public RacerId[] racers; //player is always index 0
     public GameObject playerInputSender;
@@ -17,12 +16,9 @@ public class CGameManager : GameManager
      *  1: player selected
      *  2: play through cup
      */
-    [DisplayWithoutEdit]
     public int mapSelectMode = 0;
-    [DisplayWithoutEdit]
     public MapCatolog.Cup cup;//only applicable in mapSelectMode 2
     public int courseOfCupId = -1;//only applicable in mapSelectMode 2
-    [DisplayWithoutEdit]
     public int numOfSeasonRaces = 4;//not applicable in mapSelectMode 2
     private int racesLeft;
 
