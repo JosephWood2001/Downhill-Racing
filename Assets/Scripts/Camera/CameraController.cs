@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField]
     private Transform objectToFollow;
 
     public Transform ObjectToFollow
@@ -51,6 +52,15 @@ public class CameraController : MonoBehaviour
             }
             
         }
+    }
+
+    private void Start()
+    {
+        if(objectToFollow != null)
+        {
+            ObjectToFollow = objectToFollow;
+        }
+        
     }
 
     public void LookAtTarget()

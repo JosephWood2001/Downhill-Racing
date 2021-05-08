@@ -22,8 +22,23 @@ public class InputSender : MonoBehaviour
 
     protected bool isReady = false;
 
+
     protected virtual void Update()
     {
+        if (kartInput == null)
+        {
+            if (GameObject.Find("Kart").GetComponent<Kart>().GetInput() != null)
+            {
+                kartInput = GameObject.Find("Kart").GetComponent<Kart>().GetInput();
+                kart = GameObject.Find("Kart").GetComponent<Kart>();
+            }
+            else
+            {
+                Debug.Log("Couldn't Find Kart");
+            }
+
+        }
+
         CreateInput();
         if(kartInput != null)
         {

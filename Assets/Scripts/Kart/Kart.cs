@@ -114,7 +114,14 @@ public class Kart : MonoBehaviour
         checkpointAchiver = gameObject.GetComponent<CheckpointAchiver>();
 
         angularSpeed = .5f * Mathf.Pow( maxSpeed, .5f);
+
+        if(kartInput == null)
+        {
+            kartInput = new KartInput();
+            parkingBreak = false;
+        }
     }
+
     
     protected virtual void Update()
     {
@@ -214,12 +221,15 @@ public class Kart : MonoBehaviour
         }
     }
 
-    /**For children of this class to update the inputs controlling this kart
-     * also clamps the inputs to their respective ranges
-     */
-    protected void SetInput(KartInput kartInput)
+    public void SetInput(KartInput kartInput)
     {
         this.kartInput = kartInput;
+
+    }
+
+    public KartInput GetInput()
+    {
+        return kartInput;
 
     }
 
