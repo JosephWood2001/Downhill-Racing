@@ -49,14 +49,12 @@ public class CPURay
 
         if (search == -1 && distanceOut >= Mathf.Pow(.5f,advQuality - 1) * maxSearchDistance)
         {
-            Debug.Log(-1);
             return -1;
         }
         else
         {
             if (search == -1)
             {
-                Debug.Log(distanceOut);
                 return distanceOut;
             }
         }
