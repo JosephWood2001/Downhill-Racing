@@ -50,7 +50,12 @@ MonoBehaviour:
     type: 3}
   computerInputSender: {fileID: 2648915757137067384, guid: d59b983f42b824d439181411e26b0346,
     type: 3}
-  scoreboardPrefab: {fileID: 7249628782145621476, guid: 25a646a2ac1397d428ccae5968cce869,
+  scoreboardPrefab: {fileID: 5619383781913056434, guid: 1af13307c3adc9147a0dca2c0f84d7fe,
     type: 3}
   mapSelectMode: 0
+  cup:
+    cupMiniIcon: {fileID: 0}
+    courses: []
+    coursesMiniIcons: []
+  courseOfCupId: -1
   numOfSeasonRaces: 0

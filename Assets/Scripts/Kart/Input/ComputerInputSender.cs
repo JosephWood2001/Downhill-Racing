@@ -118,7 +118,7 @@ public class ComputerInputSender : InputSender
             breaking = 0f;
         }
 
-        if (!kart.checkpointAchiver.isGrounded)
+        if (!kart.isGrounded)
         {
             Vector3 normalRelitive = Quaternion.Inverse(kart.transform.rotation) * searchForSurface.SearchNormal();
             

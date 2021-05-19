@@ -47,11 +47,6 @@ public class Checkpoint : MonoBehaviour
         kart.transform.rotation = RespawnPoint().rotation;
         kart.kartRB.velocity = Vector3.zero;
         kart.kartRB.angularVelocity = Vector3.zero;
-        for (int i = 0; i < kart.wheels.Length; i++)
-        {
-            kart.wheels[i].wheelCollider.brakeTorque = Mathf.Infinity;  
-            
-        }
         kart.kartRB.isKinematic = true;
         justSpawnedKart = kart;
         kart.gameObject.GetComponent<CheckpointAchiver>().HasRespawned();

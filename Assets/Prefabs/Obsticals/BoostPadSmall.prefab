@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2951060439783360078}
   - component: {fileID: 6174227739666676856}
   - component: {fileID: 473944495708831873}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,6 +55,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -81,6 +82,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &2445203837529109726
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,7 +94,7 @@ GameObject:
   - component: {fileID: 2445203837529109725}
   - component: {fileID: 2445203837529109724}
   - component: {fileID: 2445203837529109727}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BoostPadSmall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

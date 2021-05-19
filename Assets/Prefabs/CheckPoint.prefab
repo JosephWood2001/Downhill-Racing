@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8685072283898635731}
   - component: {fileID: 8685072283898635732}
   - component: {fileID: 8685072283898635733}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: CheckPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,3 +61,5 @@ MonoBehaviour:
   respawnPoint: {x: 0, y: 2.78, z: 0}
   despawnLevel: -30
   despawnLevelGizmo: 0
+  clearForRespawnDistance: 1
+  despawnDelay: 1

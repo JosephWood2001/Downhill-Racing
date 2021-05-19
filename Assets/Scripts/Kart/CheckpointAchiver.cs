@@ -18,23 +18,6 @@ public class CheckpointAchiver : MonoBehaviour
     private float hitGroundTime;
     private bool waitingForDelay = false;
 
-    [HideInInspector]
-    public bool isGrounded = true; // can be a bit missleading as when the kart is not grounded, but in a safe untill grounded state it will remain true
-    //OOB touch will not set this to true
-    // NOTE TO SELF : this could prove problematic in the future if the player finds a way to never make contact with a safe surface
-
-    int outOfBoundsTouch = 0;//0 means that not touching OOB objects (the number is for how many OOB objects are being touched)
-    public int OutOfBoundsTouch
-    {
-        get
-        {
-            return outOfBoundsTouch;
-        }
-        set
-        {
-            outOfBoundsTouch = value;
-        }
-    }
 
     [HideInInspector]
     public bool canAchive = true; // this is set to false when it is put into a respawn queue, the respawn queue will set it back to true when it leaves the queue
@@ -80,62 +63,27 @@ public class CheckpointAchiver : MonoBehaviour
 
     public void FixedUpdate()
     {
-        if (!isGrounded && (outOfBoundsTouch != 0 || transform.position.y < currentCheckPoint.GlobalDespawnLevel))
+        if(currentCheckPoint != null)
         {
-            if (Time.time > leftGroundTime + despawnTime && canAchive)
+            if (!kart.isGrounded && transform.position.y < currentCheckPoint.GlobalDespawnLevel)
             {
-                Respawn();
+                if (Time.time > leftGroundTime + despawnTime && canAchive)
+                {
+                    Respawn();
+                }
+            }
+            if (waitingForDelay)
+            {
+                if (Time.time > hitGroundTime + boostDelay)
+                {
+                    waitingForDelay = false;
+                    //carRB.AddForce(gameObject.transform.forward * respawnVelocityBoost, ForceMode.VelocityChange);  <<-- Currently broken
+                }
             }
         }
-        if (waitingForDelay)
-        {
-            if (Time.time > hitGroundTime + boostDelay)
-            {
-                waitingForDelay = false;
-                //carRB.AddForce(gameObject.transform.forward * respawnVelocityBoost, ForceMode.VelocityChange);  <<-- Currently broken
-            }
-        }
+        
 
 
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-
-        if (((1 << other.gameObject.layer) & safeZoneLayerMask) != 0)//checks to see if collider is safe (the layermask)
-        {
-            leftGroundTime = Time.time;
-            isGrounded = false;
-
-        }
-
-        if (((1 << other.gameObject.layer) & outOfBounds) != 0)//checks to see if collider is OOB (the layermask)
-        {
-            OutOfBoundsTouch--;
-
-        }
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-
-        if (((1 << other.gameObject.layer) & safeZoneLayerMask) != 0)//checks to see if collider is safe (the layermask)
-        {
-            isGrounded = true;
-
-            if (boostActive)
-            {
-                boostActive = false;
-                hitGroundTime = Time.time;
-                waitingForDelay = true;
-            }
-            
-        }
-
-        if (((1 << other.gameObject.layer) & outOfBounds) != 0)//checks to see if collider is OOB (the layermask)
-        {
-            OutOfBoundsTouch++;
-
-        }
     }
 
     public void Achive(Checkpoint checkpoint)
@@ -173,7 +121,6 @@ public class CheckpointAchiver : MonoBehaviour
     // Called by other classes to tell this class to reset values the should be set when respawned
     public void HasRespawned()
     {
-        isGrounded = true;
         canAchive = true;
         boostActive = true;
     }

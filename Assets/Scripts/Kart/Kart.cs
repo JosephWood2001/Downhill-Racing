@@ -8,27 +8,44 @@ using UnityEngine.XR;
 [RequireComponent(typeof(CheckpointAchiver))]
 public class Kart : MonoBehaviour
 {
-    [Header("Wheel Refrences")]
-    public Wheel[] wheels;
 
-    [Header("Wheel Mesh Refrences")]
-    public Transform[] turnMeshes;
+    BoxCollider boxCollider;
 
-    [Header("Kart Stats")]
-    public float runningStartSpeed = 2f;
-    public float maxSteerAngle = 15f;
-    public float maxSpeed = 5;
-    //the rate at whitch torque can be applied (dependant on karts maxSpeed)
-    float angularSpeed;
-    public float handeling = 5; //effect is squared
 
-    public float Handeling // gives the handeling of the kart, handycap included
+    [Header("Stats")]
+    public float acceleration = 1;
+    public float maxSpeed = 80f;
+    public float steering = 1;
+    //Handeling is steering with handycap accounted for (TODO: implement)
+    public float Handeling
     {
         get
         {
-            return handeling * handycap;
+            return steering;
+        }
+        set
+        {
+            steering = value;
         }
     }
+    public float grip = 1;
+    public float gripFadeSpeed = 100f;
+
+    [Header("Suspension Stats")]
+    public float suspensionHeight = .2f;
+    public float suspensionStrength = 1f;
+    public float suspensionDamping = 1f;
+
+    [Header("Lesser Stats")]
+    public Vector3 centerOfMassPos = new Vector3(0, 0, 0);
+    public float downwardForce = 1f;
+    public float driftGrip = .2f;
+    public float gripFadeingLength = 20f;
+    public float maxSpeedFadeLength = 20f;
+    public float angularSpeed = 1f;
+
+    [Header("Wheel Mesh Refrences")]
+    public Transform[] turnMeshes;
 
     private int place = 1;
 
@@ -44,13 +61,12 @@ public class Kart : MonoBehaviour
     }
 
 
-    //Center of mass on the rigid body
-    public Vector3 centerOfMassPos = new Vector3(0, 0, 0);
-
     [HideInInspector]
     public Rigidbody kartRB;
     [HideInInspector]
     public CheckpointAchiver checkpointAchiver;
+    [HideInInspector]
+    public bool isGrounded;
 
     private KartInput kartInput;
 
@@ -70,8 +86,6 @@ public class Kart : MonoBehaviour
 
     [SerializeField]
     private float handycap = 1f;
-    [SerializeField]
-    private float slantAssist = 1f;
 
     public float Handycap
     {
@@ -86,34 +100,16 @@ public class Kart : MonoBehaviour
         }
     }
 
-    public float SlantAssist
-    {
-        get
-        {
-            return slantAssist;
-        }
-        set
-        {
-            if(slantAssist == value)
-            {
-                return;
-            }
-            slantAssist = value;
-            ApplyHandyCap();
-        }
-    }
-
     private void Start()
     {
         kartRB = gameObject.GetComponent<Rigidbody>();
-
         kartRB.centerOfMass = centerOfMassPos;
 
-        ApplyHandyCap();//must be after kartRB is set
+        boxCollider = GetComponent<BoxCollider>();
+
+        ApplyHandyCap();
 
         checkpointAchiver = gameObject.GetComponent<CheckpointAchiver>();
-
-        angularSpeed = .5f * Mathf.Pow( maxSpeed, .5f);
 
         if(kartInput == null)
         {
@@ -125,87 +121,56 @@ public class Kart : MonoBehaviour
     
     protected virtual void Update()
     {
-        foreach (Wheel wheel in wheels)
-        {
-
-            wheel.UpdateWheelPose();
-        }
 
         UpdateTurnMeshes();
 
-        
 
         if (kartInput.Reset == true && checkpointAchiver.canAchive)
         {
             checkpointAchiver.Respawn();
         }
 
-        if (kartInput.HorizontalInput > 0 && (gameObject.transform.rotation.eulerAngles.z > 0 && gameObject.transform.rotation.eulerAngles.z < 180))
-        {
-            SlantAssist = 1f / Mathf.Abs(Mathf.Cos(Mathf.Deg2Rad * gameObject.transform.rotation.eulerAngles.z));
-        }
-        else if (kartInput.HorizontalInput < 0 && (gameObject.transform.rotation.eulerAngles.z > 180 && gameObject.transform.rotation.eulerAngles.z < 360))
-        {
-            SlantAssist = 1f / Mathf.Abs(Mathf.Cos(Mathf.Deg2Rad * gameObject.transform.rotation.eulerAngles.z));
-        }
-        else
-        {
-            SlantAssist = 1;
-        }
     }
 
+    float compression;
+    Vector3 impactPoint;
+    Vector3 impactNormal;
     private void FixedUpdate()
     {
+        Vector3 frontRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
+        Vector3 frontLeft = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f - Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
+        Vector3 backRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f - Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
+        Vector3 backLeft = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f - Vector3.right * GetComponent<BoxCollider>().size.x / 2f - Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
 
-        if (!ParkingBreak)
+        bool someContact = false;
+        if (Suspend(frontRight, out compression, out impactPoint, out impactNormal))
         {
-            bool condition1 = kartRB.velocity.magnitude < runningStartSpeed;
-            bool condition2 = (Quaternion.Inverse(transform.rotation) * kartRB.velocity).z < .1f;
-            bool condition3 = checkpointAchiver.isGrounded;
-            bool condition4 = kartInput.VerticalInput < 0;
-            if (condition1 && condition2 && condition3 && condition4)
-            {
-                foreach (Wheel wheel in wheels)
-                {
-                    wheel.Accelerate(true, kartInput.VerticalInput);
-                }
-            }
-            else
-            {
-                foreach (Wheel wheel in wheels)
-                {
-                    wheel.Accelerate(false, kartInput.VerticalInput);
-                }
-            }
+            someContact = true;
+        }
+        if (Suspend(frontLeft, out compression, out impactPoint, out impactNormal))
+        {
+            someContact = true;
+        }
+        if (Suspend(backRight, out compression, out impactPoint, out impactNormal))
+        {
+            someContact = true;
+        }
+        if (Suspend(backLeft, out compression, out impactPoint, out impactNormal))
+        {
+            someContact = true;
+        }
+        isGrounded = someContact;
 
-            if (condition1 && condition3 && !condition4)
-            {
-                kartRB.AddRelativeForce(new Vector3(0,0,2f), ForceMode.Acceleration);
-            }
-            else
-            {
-                kartRB.AddRelativeForce(Vector3.zero, ForceMode.Acceleration);
-                
-            }
+        if (someContact)
+        {
+            Accelerate(GetInput().VerticalInput * acceleration, GetAccellerationDirection(impactNormal));
+            Turn(steering * GetInput().HorizontalInput);
+            DownwardForce(downwardForce, -impactNormal);
+            GripForce(grip, GetAccellerationDirectionRight(impactNormal));
         }
 
-        foreach (Wheel wheel in wheels)
-        {
 
-            wheel.Steer(kartInput.HorizontalInput);
-
-            if (!ParkingBreak)
-            {
-                wheel.ApplyBreaks(kartInput.BreakingInput);
-            }
-            else
-            {
-                wheel.ApplyBreaks(1f);
-            }
-
-        }
-
-        if (!checkpointAchiver.isGrounded)
+        if (!someContact)
         {
             Vector3 localAngularVelocity = Quaternion.Inverse( transform.rotation ) * kartRB.angularVelocity;
             kartRB.AddRelativeTorque((new Vector3(
@@ -220,6 +185,88 @@ public class Kart : MonoBehaviour
             kartRB.AddTorque(Vector3.zero, ForceMode.Acceleration);
         }
     }
+
+
+    void GripForce(float grip, Vector3 directionRight)
+    {
+        float slide = Vector3.Dot(kartRB.velocity, directionRight);
+        float gripFadeAmount = Mathf.Clamp(gripFadeSpeed - kartRB.velocity.magnitude, driftGrip * gripFadeingLength, gripFadeingLength) / gripFadeingLength;
+        kartRB.AddForce(-slide * grip * gripFadeAmount * directionRight, ForceMode.VelocityChange);
+
+    }
+
+    void DownwardForce(float force, Vector3 direction)
+    {
+        kartRB.AddForce(force * direction, ForceMode.VelocityChange);
+
+    }
+
+    void Accelerate(float force, Vector3 forward)
+    {
+        float forceFadeAmount = Mathf.Clamp(maxSpeed - kartRB.velocity.magnitude, 0, maxSpeedFadeLength) / maxSpeedFadeLength;
+
+        kartRB.AddForce(forceFadeAmount * force * forward, ForceMode.VelocityChange);
+    }
+
+    void Turn(float turn)
+    {
+        turn *= VelocityDirection();
+
+        float turnSlide = (kartRB.angularVelocity.y - turn * 2f);
+
+        kartRB.AddTorque(-turnSlide * transform.up, ForceMode.VelocityChange);
+    }
+
+    bool Suspend(Vector3 location, out float compression, out Vector3 impactPoint, out Vector3 impactNormal)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(location, -transform.up, out hit, suspensionHeight))
+        {
+
+            compression = (suspensionHeight - hit.distance) / suspensionHeight;
+            impactPoint = hit.point;
+            impactNormal = hit.normal;
+
+            //adds force from suspension
+
+            kartRB.AddForceAtPosition((suspensionStrength * compression - suspensionDamping * Vector3.Dot(transform.up, kartRB.GetPointVelocity(location))) * transform.up, location, ForceMode.VelocityChange);
+            return true;
+        }
+        else
+        {
+            compression = 0;
+            //sentinal value for didn't hit
+            impactPoint = Vector3.negativeInfinity;
+            impactNormal = transform.up;
+            return false;
+        }
+
+
+    }
+
+
+    Vector3 GetAccellerationDirection(Vector3 impactNormal)
+    {
+        return (Quaternion.AngleAxis(90f, Vector3.Cross(impactNormal, gameObject.transform.forward)) * impactNormal).normalized;
+
+    }
+
+    Vector3 GetAccellerationDirectionRight(Vector3 impactNormal)
+    {
+        return (Quaternion.AngleAxis(90f, Vector3.Cross(impactNormal, gameObject.transform.right)) * impactNormal).normalized;
+
+    }
+
+    float VelocityDirection()
+    {
+        float direction = Vector3.Dot(transform.forward, kartRB.velocity.normalized) / Mathf.Abs(Vector3.Dot(transform.forward, kartRB.velocity.normalized));
+        if (float.IsNaN(direction))
+        {
+            direction = 1;
+        }
+        return direction;
+    }
+
 
     public void SetInput(KartInput kartInput)
     {
@@ -238,10 +285,6 @@ public class Kart : MonoBehaviour
     private void UpdateTurnMeshes()
     {
 
-        foreach (Transform turnMesh in turnMeshes)
-        {
-            turnMesh.localRotation = Quaternion.Euler(0, kartInput.HorizontalInput * maxSteerAngle, 0);
-        }
 
     }
 
@@ -252,46 +295,7 @@ public class Kart : MonoBehaviour
 
     public void ApplyHandyCap()
     {
-        handycap = Mathf.Clamp(handycap, 0f, 2f);
         
-        //formula that determins the speed of the kart through changing its drag
-        //
-        //affected by the speed of the kart so that accelleration is faster and momentum matters less
-        kartRB.drag = 1f / maxSpeed / handycap * Mathf.Pow((kartRB.velocity.magnitude / maxSpeed),5);
-        for (int i = 0; i < wheels.Length; i++)
-        {
-            if (wheels[i].isSteer)
-            {
-
-                ApplyHandyCap(wheels[i], handycap * SlantAssist);
-            }
-        }
-    }
-
-    WheelFrictionCurve wheelFrictionCurve;
-    private void ApplyHandyCap(Wheel wheel, float handycap)
-    {
-        wheelFrictionCurve = wheel.GetWheelCollider().sidewaysFriction;
-        SetFrictionCurveFromHandling(ref wheelFrictionCurve, handeling * handycap); 
-        wheel.SetWheelFrictionCurve(wheelFrictionCurve);
-    }
-
-    private void SetFrictionCurveFromHandling(ref WheelFrictionCurve wheelFriction, float handeling)
-    {
-        SetHandlingFrictionCurve(ref wheelFriction, handeling / 5f);
-    }
-
-    private void SetHandlingFrictionCurve(ref WheelFrictionCurve wheelFriction, float stiffness)
-    {
-        wheelFriction.stiffness = stiffness;
-    }
-
-    //Draws a Gizmo for the center of mass on the rigidbody
-    private void OnDrawGizmos()
-    {
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere((transform.position + transform.rotation * centerOfMassPos), .05f);
     }
 
 }

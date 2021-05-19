@@ -64,7 +64,7 @@ public class KartSelect : MonoBehaviour
             Destroy(kartObjectInPreview);
         }
         kartObjectInPreview = Instantiate(karts[kartInPreview], previewLocation.position, previewLocation.rotation);
-        previewKartHandling = kartObjectInPreview.GetComponent<Kart>().handeling;
+        previewKartHandling = kartObjectInPreview.GetComponent<Kart>().steering;
         previewKartSpeed = kartObjectInPreview.GetComponent<Kart>().maxSpeed;
         previewKartWeight = kartObjectInPreview.GetComponent<Rigidbody>().mass;
         kartObjectInPreview.GetComponent<CheckpointAchiver>().enabled = false;
