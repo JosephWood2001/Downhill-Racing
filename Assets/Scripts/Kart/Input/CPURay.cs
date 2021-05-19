@@ -58,7 +58,6 @@ public class CPURay
                 return distanceOut;
             }
         }
-        Debug.Log(Mathf.Min(search, distanceOut));
         return Mathf.Min(search, distanceOut);
     }
 
