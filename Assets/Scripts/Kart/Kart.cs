@@ -174,17 +174,20 @@ public class Kart : MonoBehaviour
         }
         isGrounded = someContact;
 
-        if (someContact)
+        if (parkingBreak)
+        {
+            BreakForce(breakingForce, GetAccellerationDirection(impactNormal));
+            //Adding turn here makes it so you can visualy see your karts turnmeshes turn, and it shouldnt actually turn the kart
+            Turn(TrueSteering * GetInput().HorizontalInput);
+        }
+        else if (someContact)
         {
             Accelerate(GetInput().VerticalInput * TrueAcceleration, GetAccellerationDirection(impactNormal));
             Turn(TrueSteering * GetInput().HorizontalInput);
             DownwardForce(downwardForce, -impactNormal);
             GripForce(grip, GetAccellerationDirectionRight(impactNormal));
             BreakForce(breakingForce * kartInput.BreakingInput, GetAccellerationDirection(impactNormal));
-        }
-
-
-        if (!someContact)
+        }else if (!someContact)
         {
             Vector3 localAngularVelocity = Quaternion.Inverse( transform.rotation ) * kartRB.angularVelocity;
             kartRB.AddRelativeTorque((new Vector3(
