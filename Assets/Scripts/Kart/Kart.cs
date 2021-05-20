@@ -47,6 +47,7 @@ public class Kart : MonoBehaviour
 
     [Header("Lesser Stats")]
     public Vector3 centerOfMassPos = new Vector3(0, 0.1f, -0.24f);
+    public float breakingForce = .3f;
     public float downwardForce = 0.2f;
     public float driftGrip = 0.05f;
     public float gripFadeingLength = 8f;
@@ -179,6 +180,7 @@ public class Kart : MonoBehaviour
             Turn(TrueSteering * GetInput().HorizontalInput);
             DownwardForce(downwardForce, -impactNormal);
             GripForce(grip, GetAccellerationDirectionRight(impactNormal));
+            BreakForce(breakingForce * kartInput.BreakingInput, GetAccellerationDirection(impactNormal));
         }
 
 
@@ -218,7 +220,7 @@ public class Kart : MonoBehaviour
         float forceFadeAmount = Mathf.Clamp(TrueMaxSpeed - kartRB.velocity.magnitude, 0, maxSpeedFadeLength) / maxSpeedFadeLength;
 
         //significently less acceleration in reverse, and none when moving forward
-        if (force < 0 && VelocityDirection() == 1)
+        if (force < 0f && VelocityDirection() == 1 && kartRB.velocity.magnitude > 2f)
         {
             forceFadeAmount = 0;
         }
@@ -228,6 +230,12 @@ public class Kart : MonoBehaviour
         }
 
         kartRB.AddForce(forceFadeAmount * force * forward, ForceMode.VelocityChange);
+    }
+
+    void BreakForce(float force, Vector3 forward)
+    {
+        kartRB.AddForce(-VelocityDirection() * force * forward, ForceMode.VelocityChange);
+
     }
 
     void Turn(float turn)
