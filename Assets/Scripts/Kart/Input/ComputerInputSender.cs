@@ -109,7 +109,7 @@ public class ComputerInputSender : InputSender
         horizontal -= offAngleRightValue;
 
         
-        if(kart.kartRB.velocity.magnitude > Mathf.Pow(Mathf.Pow(kart.Handeling, handelingSpeedLimitIntensity) / (offAngleRightFarValue + offAngleRightLongValue),curveIntensity) * speedLimitIntensity)
+        if(kart.kartRB.velocity.magnitude > Mathf.Pow(Mathf.Pow(kart.TrueSteering, handelingSpeedLimitIntensity) / (offAngleRightFarValue + offAngleRightLongValue),curveIntensity) * speedLimitIntensity)
         {
             breaking = 1f;
         }

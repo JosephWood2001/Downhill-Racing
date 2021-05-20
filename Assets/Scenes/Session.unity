@@ -6409,6 +6409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98076883c44ab384b88a3265d5c86d41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectToFollow: {fileID: 0}
   minDistance: 3
   maxDistance: 5
   speedEffectivenessOnDistance: 0.04
@@ -8593,7 +8594,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfRacers: 8
   racers: []
-  handycapIntensity: 0.01
+  handycapIntensity: 0.5
   raceID: 0
   startRaceAnimation: {fileID: 3104256459415824424, guid: bfcd154e5e0ab054f948bcd48c4a0d44,
     type: 3}

@@ -14,18 +14,28 @@ public class Kart : MonoBehaviour
 
     [Header("Stats")]
     public float acceleration = 1;
-    public float maxSpeed = 80f;
-    public float steering = 1;
-    //Handeling is steering with handycap accounted for (TODO: implement)
-    public float Handeling
+    public float TrueAcceleration
     {
         get
         {
-            return steering;
+            return acceleration * Mathf.Pow(Handycap, handycapOnAcceleration);
         }
-        set
+    }
+
+    public float maxSpeed = 80f;
+    public float TrueMaxSpeed
+    {
+        get
         {
-            steering = value;
+            return maxSpeed * Mathf.Pow(Handycap, handycapOnMaxSpeed);
+        }
+    }
+    public float steering = 1;
+    public float TrueSteering
+    {
+        get
+        {
+            return steering * Mathf.Pow(Handycap,handycapOnSteering);
         }
     }
     public float grip = 1;
@@ -43,6 +53,9 @@ public class Kart : MonoBehaviour
     public float gripFadeingLength = 20f;
     public float maxSpeedFadeLength = 20f;
     public float angularSpeed = 1f;
+    public float handycapOnSteering = .5f;
+    public float handycapOnMaxSpeed = .5f;
+    public float handycapOnAcceleration = 1f;
 
     [Header("Wheel Mesh Refrences")]
     public Transform[] turnMeshes;
@@ -96,7 +109,6 @@ public class Kart : MonoBehaviour
         set
         {
             handycap = value;
-            ApplyHandyCap();
         }
     }
 
@@ -106,8 +118,6 @@ public class Kart : MonoBehaviour
         kartRB.centerOfMass = centerOfMassPos;
 
         boxCollider = GetComponent<BoxCollider>();
-
-        ApplyHandyCap();
 
         checkpointAchiver = gameObject.GetComponent<CheckpointAchiver>();
 
@@ -123,7 +133,7 @@ public class Kart : MonoBehaviour
     {
 
         UpdateTurnMeshes();
-
+        
 
         if (kartInput.Reset == true && checkpointAchiver.canAchive)
         {
@@ -137,6 +147,8 @@ public class Kart : MonoBehaviour
     Vector3 impactNormal;
     private void FixedUpdate()
     {
+        Debug.Log(Handycap);
+
         Vector3 frontRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
         Vector3 frontLeft = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f - Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
         Vector3 backRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f - Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
@@ -163,8 +175,8 @@ public class Kart : MonoBehaviour
 
         if (someContact)
         {
-            Accelerate(GetInput().VerticalInput * acceleration, GetAccellerationDirection(impactNormal));
-            Turn(steering * GetInput().HorizontalInput);
+            Accelerate(GetInput().VerticalInput * TrueAcceleration, GetAccellerationDirection(impactNormal));
+            Turn(TrueSteering * GetInput().HorizontalInput);
             DownwardForce(downwardForce, -impactNormal);
             GripForce(grip, GetAccellerationDirectionRight(impactNormal));
         }
@@ -203,7 +215,7 @@ public class Kart : MonoBehaviour
 
     void Accelerate(float force, Vector3 forward)
     {
-        float forceFadeAmount = Mathf.Clamp(maxSpeed - kartRB.velocity.magnitude, 0, maxSpeedFadeLength) / maxSpeedFadeLength;
+        float forceFadeAmount = Mathf.Clamp(TrueMaxSpeed - kartRB.velocity.magnitude, 0, maxSpeedFadeLength) / maxSpeedFadeLength;
 
         kartRB.AddForce(forceFadeAmount * force * forward, ForceMode.VelocityChange);
     }
@@ -293,9 +305,5 @@ public class Kart : MonoBehaviour
         kartInput = input;
     }
 
-    public void ApplyHandyCap()
-    {
-        
-    }
 
 }

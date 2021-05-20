@@ -8,7 +8,6 @@ public class RaceManager : MonoBehaviour
     public int numberOfRacers = 8; //Temperary
 
     public RacerId[] racers;
-    [HideInInspector]
     public float handycapIntensity = .005f;
     private bool raceActive = false;
 
