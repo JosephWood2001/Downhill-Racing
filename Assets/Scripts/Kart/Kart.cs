@@ -223,9 +223,18 @@ public class Kart : MonoBehaviour
     void Turn(float turn)
     {
         turn *= VelocityDirection();
+        //no turn if kart isn't moving
+        if (kartRB.velocity.magnitude < 1f)
+        {
+            turn *= kartRB.velocity.magnitude;
+        }
 
         float turnSlide = (kartRB.angularVelocity.y - turn * 2f);
-
+        //no turn if kart isn't moving
+        if(kartRB.velocity.magnitude < .01f)
+        {
+            turn = 0;
+        }
         kartRB.AddTorque(-turnSlide * transform.up, ForceMode.VelocityChange);
 
         UpdateTurnMeshes(turnMeshes, maxSteeringAngle * kartInput.HorizontalInput);
