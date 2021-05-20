@@ -639,8 +639,12 @@ MonoBehaviour:
   gripFadeingLength: 8
   maxSpeedFadeLength: 5
   angularSpeed: 1
+  handycapOnSteering: 0.5
+  handycapOnMaxSpeed: 0.5
+  handycapOnAcceleration: 1
   turnMeshes:
   - {fileID: 8169890150813936994}
+  wheelMeshes: []
   kartRB: {fileID: 0}
   checkpointAchiver: {fileID: 0}
   isGrounded: 0
@@ -679,8 +683,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.44, y: 0.14, z: 0.85}
-  m_Center: {x: 0, y: 0.29, z: -0.31}
+  m_Size: {x: 0.44, y: 0.32, z: 0.85}
+  m_Center: {x: 0, y: 0.38, z: -0.31}
 --- !u!1 &8859721447100572954
 GameObject:
   m_ObjectHideFlags: 0

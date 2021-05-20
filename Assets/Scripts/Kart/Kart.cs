@@ -13,7 +13,7 @@ public class Kart : MonoBehaviour
 
 
     [Header("Stats")]
-    public float acceleration = 1;
+    public float acceleration = .1f;
     public float TrueAcceleration
     {
         get
@@ -21,8 +21,7 @@ public class Kart : MonoBehaviour
             return acceleration * Mathf.Pow(Handycap, handycapOnAcceleration);
         }
     }
-
-    public float maxSpeed = 80f;
+    public float maxSpeed = 20f;
     public float TrueMaxSpeed
     {
         get
@@ -38,28 +37,31 @@ public class Kart : MonoBehaviour
             return steering * Mathf.Pow(Handycap,handycapOnSteering);
         }
     }
-    public float grip = 1;
-    public float gripFadeSpeed = 100f;
+    public float grip = .5f;
+    public float gripFadeSpeed = 20f;
 
     [Header("Suspension Stats")]
-    public float suspensionHeight = .2f;
+    public float suspensionHeight = .25f;
     public float suspensionStrength = 1f;
-    public float suspensionDamping = 1f;
+    public float suspensionDamping = .1f;
 
     [Header("Lesser Stats")]
-    public Vector3 centerOfMassPos = new Vector3(0, 0, 0);
-    public float downwardForce = 1f;
-    public float driftGrip = .2f;
-    public float gripFadeingLength = 20f;
-    public float maxSpeedFadeLength = 20f;
+    public Vector3 centerOfMassPos = new Vector3(0, 0.1f, -0.24f);
+    public float downwardForce = 0.2f;
+    public float driftGrip = 0.05f;
+    public float gripFadeingLength = 8f;
+    public float maxSpeedFadeLength = 5f;
     public float angularSpeed = 1f;
-    public float handycapOnSteering = .5f;
-    public float handycapOnMaxSpeed = .5f;
+    public float handycapOnSteering = 0.5f;
+    public float handycapOnMaxSpeed = 0.5f;
     public float handycapOnAcceleration = 1f;
+    public float maxSteeringAngle = 30f;
 
-    [Header("Wheel Mesh Refrences")]
+    [Header("Mesh Refrences")]
     public Transform[] turnMeshes;
+    public Transform[] wheelMeshes;
 
+    [Header("View Only")]
     private int place = 1;
 
     public int Place{
@@ -131,8 +133,6 @@ public class Kart : MonoBehaviour
     
     protected virtual void Update()
     {
-
-        UpdateTurnMeshes();
         
 
         if (kartInput.Reset == true && checkpointAchiver.canAchive)
@@ -227,6 +227,8 @@ public class Kart : MonoBehaviour
         float turnSlide = (kartRB.angularVelocity.y - turn * 2f);
 
         kartRB.AddTorque(-turnSlide * transform.up, ForceMode.VelocityChange);
+
+        UpdateTurnMeshes(turnMeshes, maxSteeringAngle * kartInput.HorizontalInput);
     }
 
     bool Suspend(Vector3 location, out float compression, out Vector3 impactPoint, out Vector3 impactNormal)
@@ -292,11 +294,18 @@ public class Kart : MonoBehaviour
 
     }
 
-    /**updates all wheels to their respective poses from their wheel colliders
-     */
-    private void UpdateTurnMeshes()
+    private void UpdateTurnMeshes(Transform[] meshes, float steeringAngle)
     {
+        foreach(Transform mesh in meshes)
+        {
+            mesh.localRotation = Quaternion.Euler(0, steeringAngle, 0);
+        }
 
+    }
+
+    private void UpdateWheelMeshes()
+    {
+        //TODO
 
     }
 
@@ -305,5 +314,10 @@ public class Kart : MonoBehaviour
         kartInput = input;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(transform.position + transform.rotation * centerOfMassPos, .05f);
+    }
 
 }
