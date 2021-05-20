@@ -193,11 +193,6 @@ public class Kart : MonoBehaviour
                 -((localAngularVelocity.z + kartInput.AirRollInput * angularSpeed) * .05f)
                 )), ForceMode.VelocityChange);
         }
-        else
-        {
-
-            kartRB.AddTorque(Vector3.zero, ForceMode.Acceleration);
-        }
     }
 
 
@@ -234,6 +229,11 @@ public class Kart : MonoBehaviour
 
     void BreakForce(float force, Vector3 forward)
     {
+        //reduces jitteryness when breaking at a full stop
+        if(kartRB.velocity.magnitude < 1)
+        {
+            force *= kartRB.velocity.magnitude;
+        }
         kartRB.AddForce(-VelocityDirection() * force * forward, ForceMode.VelocityChange);
 
     }
