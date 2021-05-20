@@ -217,6 +217,16 @@ public class Kart : MonoBehaviour
     {
         float forceFadeAmount = Mathf.Clamp(TrueMaxSpeed - kartRB.velocity.magnitude, 0, maxSpeedFadeLength) / maxSpeedFadeLength;
 
+        //significently less acceleration in reverse, and none when moving forward
+        if (force < 0 && VelocityDirection() == 1)
+        {
+            forceFadeAmount = 0;
+        }
+        else if(force < 0)
+        {
+            forceFadeAmount *= .5f;
+        }
+
         kartRB.AddForce(forceFadeAmount * force * forward, ForceMode.VelocityChange);
     }
 
