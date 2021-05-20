@@ -57,6 +57,7 @@ public class Kart : MonoBehaviour
     public float handycapOnMaxSpeed = 0.5f;
     public float handycapOnAcceleration = 1f;
     public float maxSteeringAngle = 30f;
+    public LayerMask trackLayerMask = 7;
 
     [Header("Mesh Refrences")]
     public Transform[] turnMeshes;
@@ -82,7 +83,9 @@ public class Kart : MonoBehaviour
     [HideInInspector]
     public CheckpointAchiver checkpointAchiver;
     [HideInInspector]
-    public bool isGrounded;
+    public bool isGrounded = true;
+    [HideInInspector]
+    public bool isGroundedToTrack = true;
 
     private KartInput kartInput;
 
@@ -144,50 +147,65 @@ public class Kart : MonoBehaviour
     }
 
     float compression;
-    Vector3 impactPoint;
+    LayerMask impactLayer;
     Vector3 impactNormal;
     private void FixedUpdate()
     {
-        Debug.Log(Handycap);
+        
 
         Vector3 frontRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
         Vector3 frontLeft = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f - Vector3.right * GetComponent<BoxCollider>().size.x / 2f + Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
         Vector3 backRight = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f + Vector3.right * GetComponent<BoxCollider>().size.x / 2f - Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
         Vector3 backLeft = transform.position + transform.rotation * (GetComponent<BoxCollider>().center - Vector3.up * GetComponent<BoxCollider>().size.y / 2f - Vector3.right * GetComponent<BoxCollider>().size.x / 2f - Vector3.forward * GetComponent<BoxCollider>().size.z / 2f);
 
-        bool someContact = false;
-        if (Suspend(frontRight, out compression, out impactPoint, out impactNormal))
+        isGrounded = false;
+        isGroundedToTrack = false;
+        if (Suspend(frontRight, out compression, out impactLayer, out impactNormal))
         {
-            someContact = true;
+            isGrounded = true;
+            if(trackLayerMask == (trackLayerMask | (1 << impactLayer)))
+            {
+                isGroundedToTrack = true;
+            }
         }
-        if (Suspend(frontLeft, out compression, out impactPoint, out impactNormal))
+        if (Suspend(frontLeft, out compression, out impactLayer, out impactNormal))
         {
-            someContact = true;
+            isGrounded = true;
+            if (trackLayerMask == (trackLayerMask | (1 << impactLayer)))
+            {
+                isGroundedToTrack = true;
+            }
         }
-        if (Suspend(backRight, out compression, out impactPoint, out impactNormal))
+        if (Suspend(backRight, out compression, out impactLayer, out impactNormal))
         {
-            someContact = true;
+            isGrounded = true;
+            if (trackLayerMask == (trackLayerMask | (1 << impactLayer)))
+            {
+                isGroundedToTrack = true;
+            }
         }
-        if (Suspend(backLeft, out compression, out impactPoint, out impactNormal))
+        if (Suspend(backLeft, out compression, out impactLayer, out impactNormal))
         {
-            someContact = true;
+            isGrounded = true;
+            if (trackLayerMask == (trackLayerMask | (1 << impactLayer)))
+            {
+                isGroundedToTrack = true;
+            }
         }
-        isGrounded = someContact;
-
         if (parkingBreak)
         {
             BreakForce(breakingForce, GetAccellerationDirection(impactNormal));
             //Adding turn here makes it so you can visualy see your karts turnmeshes turn, and it shouldnt actually turn the kart
             Turn(TrueSteering * GetInput().HorizontalInput);
         }
-        else if (someContact)
+        else if (isGrounded)
         {
             Accelerate(GetInput().VerticalInput * TrueAcceleration, GetAccellerationDirection(impactNormal));
             Turn(TrueSteering * GetInput().HorizontalInput);
             DownwardForce(downwardForce, -impactNormal);
             GripForce(grip, GetAccellerationDirectionRight(impactNormal));
             BreakForce(breakingForce * kartInput.BreakingInput, GetAccellerationDirection(impactNormal));
-        }else if (!someContact)
+        }else if (!isGrounded)
         {
             Vector3 localAngularVelocity = Quaternion.Inverse( transform.rotation ) * kartRB.angularVelocity;
             kartRB.AddRelativeTorque((new Vector3(
@@ -261,14 +279,14 @@ public class Kart : MonoBehaviour
         UpdateTurnMeshes(turnMeshes, maxSteeringAngle * kartInput.HorizontalInput);
     }
 
-    bool Suspend(Vector3 location, out float compression, out Vector3 impactPoint, out Vector3 impactNormal)
+    bool Suspend(Vector3 location, out float compression, out LayerMask impactLayer, out Vector3 impactNormal)
     {
         RaycastHit hit;
         if (Physics.Raycast(location, -transform.up, out hit, suspensionHeight))
         {
 
             compression = (suspensionHeight - hit.distance) / suspensionHeight;
-            impactPoint = hit.point;
+            impactLayer = hit.collider.gameObject.layer;
             impactNormal = hit.normal;
 
             //adds force from suspension
@@ -280,7 +298,7 @@ public class Kart : MonoBehaviour
         {
             compression = 0;
             //sentinal value for didn't hit
-            impactPoint = Vector3.negativeInfinity;
+            impactLayer = 0;
             impactNormal = transform.up;
             return false;
         }

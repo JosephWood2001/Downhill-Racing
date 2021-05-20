@@ -740,6 +740,7 @@ MonoBehaviour:
   suspensionStrength: 1
   suspensionDamping: 0.1
   centerOfMassPos: {x: 0, y: 0.07, z: -0.37}
+  breakingForce: 0.3
   downwardForce: 0.2
   driftGrip: 0.05
   gripFadeingLength: 8
@@ -749,12 +750,16 @@ MonoBehaviour:
   handycapOnMaxSpeed: 0.5
   handycapOnAcceleration: 1
   maxSteeringAngle: 30
+  trackLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
   turnMeshes:
   - {fileID: 6265357123745265176}
   wheelMeshes: []
   kartRB: {fileID: 0}
   checkpointAchiver: {fileID: 0}
   isGrounded: 0
+  isGroundedToTrack: 1
   handycap: 1
 --- !u!65 &216008846567480116
 BoxCollider:

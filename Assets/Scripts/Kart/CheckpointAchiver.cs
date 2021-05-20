@@ -65,13 +65,22 @@ public class CheckpointAchiver : MonoBehaviour
     {
         if(currentCheckPoint != null)
         {
-            if (!kart.isGrounded && transform.position.y < currentCheckPoint.GlobalDespawnLevel)
+            if(transform.position.y < currentCheckPoint.GlobalDespawnLevel)
+            {
+                Respawn();
+            }
+            else if (!kart.isGroundedToTrack)
             {
                 if (Time.time > leftGroundTime + despawnTime && canAchive)
                 {
                     Respawn();
                 }
             }
+            else
+            {
+                leftGroundTime = Time.time;
+            }
+
             if (waitingForDelay)
             {
                 if (Time.time > hitGroundTime + boostDelay)
