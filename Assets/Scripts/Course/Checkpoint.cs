@@ -36,13 +36,17 @@ public class Checkpoint : MonoBehaviour
 
     public void Respawn(Kart kart)
     {
+        Debug.Log("Enqueue + " + kart.name);
         respawnQueue.Enqueue(kart);
     }
 
     private Kart justSpawnedKart = null;
     private void SpawnFromQueue()
     {
+
         Kart kart = respawnQueue.Dequeue();
+        Debug.Log("Dequeue + " + kart.name);
+
         kart.transform.position = RespawnPoint().position;
         kart.transform.rotation = RespawnPoint().rotation;
         kart.kartRB.velocity = Vector3.zero;

@@ -65,7 +65,7 @@ public class CheckpointAchiver : MonoBehaviour
     {
         if(currentCheckPoint != null)
         {
-            if(transform.position.y < currentCheckPoint.GlobalDespawnLevel)
+            if(transform.position.y < currentCheckPoint.GlobalDespawnLevel && canAchive)
             {
                 Respawn();
             }
