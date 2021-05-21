@@ -714,11 +714,15 @@ public class Path : MonoBehaviour
             deltaT = (distance / ((float)quality)) / curves[currentCurve].TangentAtPoint(t).magnitude;
             t += deltaT;
 
-            if (t > 1)//has surpassed current curve
+            if (t >= 1)//has surpassed current curve
             {
                 t = t - 1;
 
-                if (curves[currentCurve].Node2.EgressCurves.Count <= 1)
+                if (curves[currentCurve].Node2.EgressCurves.Count == 0) // has reached the end of the path
+                {
+                    t = .999f;
+                }
+                else if (curves[currentCurve].Node2.EgressCurves.Count == 1)
                 {
                     currentCurve = curves.IndexOf(curves[currentCurve].Node2.EgressCurves[0]);
                 }
