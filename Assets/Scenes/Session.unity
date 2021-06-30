@@ -8343,6 +8343,12 @@ MonoBehaviour:
     coursesMiniIcons:
     - {fileID: 8306087860725596308, guid: 9cea1ad747fd3834c98ae070074887f7, type: 3}
     - {fileID: 8649728184061097783, guid: 54d44dc16cd664749ae4571864719c93, type: 3}
+  - cupMiniIcon: {fileID: 2859151637640512091, guid: 66c81d4bfcb722c449da30f8781b162a,
+      type: 3}
+    courses:
+    - Track1
+    coursesMiniIcons:
+    - {fileID: 2859151637640512091, guid: 66c81d4bfcb722c449da30f8781b162a, type: 3}
 --- !u!4 &1253757068
 Transform:
   m_ObjectHideFlags: 0

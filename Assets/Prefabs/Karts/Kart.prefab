@@ -626,12 +626,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acceleration: 0.1
-  maxSpeed: 20
+  maxSpeed: 15
   steering: 1
   grip: 0.5
   gripFadeSpeed: 20
   suspensionHeight: 0.25
-  suspensionStrength: 1
+  suspensionStrength: 0.5
   suspensionDamping: 0.1
   centerOfMassPos: {x: 0, y: 0.1, z: -0.24}
   breakingForce: 0.3

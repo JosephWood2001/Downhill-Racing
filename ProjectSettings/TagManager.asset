@@ -24,6 +24,8 @@ TagManager:
   - GameTypeManagers
   - CustomGamePos
   - Path
+  - PlacementCursor
+  - ObjectsLog
   layers:
   - Default
   - TransparentFX
@@ -35,7 +37,7 @@ TagManager:
   - 
   - Safe
   - OutOfBounds
-  - 
+  - PlaceAtop
   - 
   - 
   - 

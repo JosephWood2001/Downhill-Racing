@@ -737,7 +737,7 @@ MonoBehaviour:
   grip: 0.4
   gripFadeSpeed: 20
   suspensionHeight: 0.15
-  suspensionStrength: 1
+  suspensionStrength: 0.5
   suspensionDamping: 0.1
   centerOfMassPos: {x: 0, y: 0.07, z: -0.37}
   breakingForce: 0.3

@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Courses/Hairpin Canyon 2/Hairpin Canyon 2.unity
     guid: 6d5ac83b4197fb74ba542476c1be0627
+  - enabled: 1
+    path: Assets/Scenes/Courses/Track1/Track1.unity
+    guid: 436382f415b1c614d9ab825ae67479a3
   m_configObjects: {}
