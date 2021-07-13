@@ -19,9 +19,9 @@ public class SpectatorControls : MonoBehaviour
         {
             float mouseX = Input.GetAxisRaw("Mouse X") * sensitivity;
             float mouseY = Input.GetAxisRaw("Mouse Y") * sensitivity;
-
+            
             transform.Rotate(new Vector3(0, mouseX, 0), Space.World);
-
+            
             transform.Rotate(new Vector3(-mouseY, 0, 0));
 
             float yAngle = transform.localRotation.eulerAngles.x;
@@ -38,7 +38,7 @@ public class SpectatorControls : MonoBehaviour
         velocity.x += Input.GetAxis("Horizontal") * speed * Mathf.Clamp(transform.position.y,1f, 10000f);
         velocity.z += Input.GetAxis("Vertical") * speed * Mathf.Clamp(transform.position.y, 1f, 10000f);
         velocity.y += Input.GetAxis("AirHorizontal") * speed * Mathf.Clamp(transform.position.y, 1f, 10000f);
-        transform.Translate(Quaternion.Euler(0,transform.rotation.eulerAngles.y,0) * velocity,Space.World);
+        transform.Translate(Quaternion.Euler(0,transform.rotation.eulerAngles.y,0) * velocity * Time.deltaTime,Space.World);
         //end
 
     }

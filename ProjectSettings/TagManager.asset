@@ -26,6 +26,7 @@ TagManager:
   - Path
   - PlacementCursor
   - ObjectsLog
+  - PartEdit
   layers:
   - Default
   - TransparentFX

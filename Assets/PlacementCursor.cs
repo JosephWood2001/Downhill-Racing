@@ -8,6 +8,7 @@ public class PlacementCursor : MonoBehaviour
     public ObjectsLog objLog;
     public LayerMask placeAtopLayer;
     public PartPanel placePartSelected;
+    public ObjectsLog.PartInfo selectedPart;
     GameObject ghostObj;
 
     EmptyTransform placePoint = new EmptyTransform(Vector3.zero, Quaternion.identity);
@@ -17,7 +18,11 @@ public class PlacementCursor : MonoBehaviour
         {
             
             placePoint.position = GetCursorWorldPoint();
-            placePoint = Snapping(placePoint);
+            if (placePartSelected != null)
+            {
+                placePoint = Snapping(placePoint);
+
+            }
             if (ghostObj != null)
             {
                 ghostObj.SetActive(true);
@@ -34,6 +39,13 @@ public class PlacementCursor : MonoBehaviour
                 if (placePartSelected != null)
                 {
                     PlacePart(placePoint);
+                }else if (GetCursorPart() != null)
+                {
+                    SelectPart(GetCursorPart());
+                }
+                else
+                {
+                    SelectPart(selectedPart); // deselect Part
                 }
             }
         }
@@ -54,20 +66,21 @@ public class PlacementCursor : MonoBehaviour
     {
         foreach (ObjectsLog.PartInfo partInfo in objLog.GetParts())
         {
-            foreach (EmptyTransform emptyTransform in partInfo.part.snapPoints)
+            foreach (EmptyTransform placedSnapPoint in partInfo.part.snapPoints)
             {
-                foreach (EmptyTransform thisEmptyTransform in placePartSelected.snapPoints)
+                foreach (EmptyTransform placingSnapPoint in placePartSelected.snapPoints)
                 {
-                    Debug.Log(emptyTransform.position + partInfo.obj.transform.position + "   " + (thisEmptyTransform.position + ghostPos.position));
-                    if ((emptyTransform.position + partInfo.obj.transform.position //placed object's snap point position
-                        - (thisEmptyTransform.position + ghostPos.position) //ghost object's snap point position
+                    if ((partInfo.obj.transform.rotation * placedSnapPoint.position + partInfo.obj.transform.position //placed object's snap point position
+                        - (partInfo.obj.transform.rotation * placedSnapPoint.rotation * Quaternion.Inverse(placingSnapPoint.rotation) * placingSnapPoint.position + ghostPos.position) //ghost object's snap point position
                         ).magnitude <= tolerance
                         &&
-                        Quaternion.Angle(emptyTransform.rotation * partInfo.part.transform.rotation, ////placed object's snap point rotation
-                        emptyTransform.rotation * partInfo.part.transform.rotation) ////ghost object's snap point rotation
+                        Quaternion.Angle(placedSnapPoint.rotation * partInfo.part.transform.rotation, //placed object's snap point rotation
+                        placedSnapPoint.rotation * partInfo.part.transform.rotation) //ghost object's snap point rotation
                         < 10000000000f)
                     {
-                        return new EmptyTransform(partInfo.obj.transform.position + emptyTransform.position - thisEmptyTransform.position, emptyTransform.rotation);
+                        return new EmptyTransform(partInfo.obj.transform.position + partInfo.obj.transform.rotation * placedSnapPoint.position - partInfo.obj.transform.rotation * placedSnapPoint.rotation * Quaternion.Inverse(placingSnapPoint.rotation) * placingSnapPoint.position,
+                            partInfo.obj.transform.rotation * placedSnapPoint.rotation * Quaternion.Inverse(placingSnapPoint.rotation));
+                        
                     }
                 }
             }
@@ -92,21 +105,54 @@ public class PlacementCursor : MonoBehaviour
 
     }
 
+    public ObjectsLog.PartInfo GetCursorPart()
+    {
+        if (!EventSystem.current.IsPointerOverGameObject())
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!Physics.Raycast(ray, out hit, 1000f, placeAtopLayer))
+            {
+                return null;
+            }
+
+            foreach(ObjectsLog.PartInfo partInfo in objLog.GetParts())
+            {
+                if(hit.collider.gameObject.transform.parent != null)
+                    if (partInfo.obj == hit.collider.gameObject || partInfo.obj == hit.collider.gameObject.transform.parent.gameObject)
+                {
+                    return partInfo;
+                }
+            }
+        }
+        return null;
+
+    }
+
     public void PlacePart(EmptyTransform emptyTransform)
     {
         GameObject temp = Instantiate(placePartSelected.partPrefab);
         GameObject.FindGameObjectWithTag("ObjectsLog").GetComponent<ObjectsLog>().Add(new ObjectsLog.PartInfo(placePartSelected,temp));
         temp.transform.position = emptyTransform.position;
-        //temp.transform.rotation = emptyTransform.rotation;
+        temp.transform.rotation = emptyTransform.rotation;
     }
 
     public void PickPart(PartPanel part)
     {
+        if(selectedPart != null)
+        {
+            selectedPart = null;
+            GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(false);
+
+        }
+
         if (part == placePartSelected)
         {
             placePartSelected = null;
+            GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(false);
             return;
         }
+        GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(true);
         placePartSelected = part;
         Destroy(ghostObj);
         ghostObj = Instantiate(part.partPrefab);
@@ -120,6 +166,19 @@ public class PlacementCursor : MonoBehaviour
         {
             ghostObj.GetComponentInChildren<MeshCollider>().enabled = false;
         }
+    }
+
+    public void SelectPart(ObjectsLog.PartInfo partInfo)
+    {
+        if (partInfo == selectedPart)
+        {
+            GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(false);//disable BEFORE deselecting part
+            selectedPart = null;
+            return;
+        }
+        GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(false);//disable BEFORE selecting part
+        selectedPart = partInfo;
+        GameObject.FindGameObjectWithTag("PartEdit").transform.GetChild(0).gameObject.SetActive(true);//enable AFTER selecting part
     }
 
     

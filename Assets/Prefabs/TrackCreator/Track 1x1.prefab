@@ -93,9 +93,9 @@ MonoBehaviour:
     type: 3}
   snapPoints:
   - position: {x: 0, y: 0, z: 4}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
   - position: {x: 0, y: 0, z: -4}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!114 &235808976984333326
 MonoBehaviour:
   m_ObjectHideFlags: 0
